@@ -1,0 +1,47 @@
+cabal-version:      2.4
+name:               shloka
+version:            0.1.0
+author:             Kierán Meinhardt
+maintainer:         kmein@posteo.de
+extra-source-files:
+
+library
+    hs-source-dirs:   lib
+    exposed-modules:  Shloka.Extra
+                    , Shloka.Parse
+                    , Shloka.Token
+                    , Shloka.Syllable
+    build-depends:    base ^>=4.14.3.0
+                    , megaparsec
+                    , bytestring >= 0.10 && < 0.11
+                    , vector >= 0.12 && < 0.13
+                    , cassava >= 0.5 && < 0.6
+                    , unicode-transforms >= 0.3 && < 0.4
+                    , text >= 1 && < 2
+                    , split >= 0.2 && < 0.3
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall
+
+executable shloka
+    main-is:          Main.hs
+    hs-source-dirs:   app
+    build-depends:    base ^>=4.14.3.0
+                    , shloka
+                    , text >= 1 && < 2
+                    , cassava >= 0.5 && < 0.6
+                    , bytestring >= 0.10 && < 0.11
+                    , containers
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall
+
+test-suite shloka-test
+    type:             exitcode-stdio-1.0
+    main-is:          Spec.hs
+    hs-source-dirs:   test
+    build-depends:    base ^>=4.14.3.0
+                    , shloka
+                    , text >= 1 && < 2
+                    , tasty
+                    , tasty-hunit
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall
