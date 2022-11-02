@@ -12,5 +12,10 @@ haskellPackages.developPackage {
         ${pkgs.wget}/bin/wget "$(printf "https://bombay.indology.info/mahabharata/text/ASCII/MBh%02d.txt" "$book")" -P ${toString ./text}
       done
     '')
+    (pkgs.writers.writeDashBin "fetch-ram" ''
+      for book in $(seq 1 7); do
+        ${pkgs.wget}/bin/wget "$(printf "https://bombay.indology.info/mahabharata/text/ASCII/Ram%02d.txt" "$book")" -P ${toString ./text}
+      done
+    '')
   ]);
 }
