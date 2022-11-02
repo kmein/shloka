@@ -16,14 +16,20 @@ type Parser = Parsec Void Text.Text
 data NoLine = Comment Text
     deriving (Show)
 
-data LineType = Verse Char | Prose Char | Heading
+data LineType = Verse | Prose | Heading
     deriving (Show)
 
-data Line = Line {lineLocation :: (Int, Int, Int), lineType :: LineType, lineText :: Text}
+data Line = Line {lineLocation :: (Int, Int, Int, Maybe Char), lineType :: LineType, lineText :: Text}
     deriving (Show)
 
-parse :: Parser [Either NoLine Line]
-parse = (((Right <$> parseLine) <|> (Left <$> parseComment)) `sepEndBy` crlf) <* eof
+parseTest :: Text -> IO ()
+parseTest = Text.Megaparsec.parseTest theParser
+
+parse :: Text -> Either (ParseErrorBundle Text Void) [Either NoLine Line]
+parse = Text.Megaparsec.parse theParser ""
+
+theParser :: Parser [Either NoLine Line]
+theParser = (((Right <$> parseLine) <|> (Left <$> parseComment)) `sepEndBy` crlf) <* eof
 
 parseComment :: Parser NoLine
 parseComment =
