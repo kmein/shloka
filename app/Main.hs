@@ -54,4 +54,13 @@ mahabharataBook book =
     (either (error . show) id . parse) <$> Text.readFile (printf "text/MBh%02d.txt" book)
 
 main :: IO ()
-main = putStrLn "It compiles, ship it!"
+main =
+    forM_ [1 .. 18] $ \book -> do
+        lines1 <- mahabharataBook book
+        let verses1 = rights lines1
+        forM_ verses1 $ \verse ->
+            printf
+                "%s %s %s\n"
+                (show $ lineLocation verse)
+                (show $ lineType verse)
+                (show $ scanVerse (lineText verse))
