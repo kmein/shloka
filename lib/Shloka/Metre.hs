@@ -6,20 +6,20 @@ import Shloka.Token (longVowelTokens)
 data Metre = Shloka | Trishtubh
     deriving (Show)
 
-data Length = Laghu | Guna
+data Length = Laghu | Guru
 
 instance Show Length where
     show Laghu = "L"
-    show Guna = "G"
+    show Guru = "G"
     showList x s = concat (map show x) ++ s
 
 scanSyllable :: Syllable -> Length
-scanSyllable (Syllable segments) =
-    if length segments > 2
-        then Guna
+scanSyllable syllable =
+    if length (coda syllable) > 0
+        then Guru
         else
-            if last segments `elem` longVowelTokens
-                then Guna
+            if all (`elem` longVowelTokens) $ nucleus syllable
+                then Guru
                 else Laghu
 
 guessMetre :: [[Length]] -> Maybe Metre
