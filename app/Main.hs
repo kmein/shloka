@@ -1,66 +1,44 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE TypeApplications #-}
 module Main where
 
 import qualified Data.Text as Text
 
 import Control.Monad (forM_)
 import Data.Either (rights)
-import Data.List.Split (chunksOf)
-import Data.Text (Text)
-import qualified Data.Text.IO as Text (readFile)
-import Shloka.Parse (Line (..), NoLine, parse)
-import Shloka.Syllable (syllabify)
-import Shloka.Token (Token, longVowelTokens, tokenize)
-import Text.Printf (printf)
+import Data.Text (Text, pack)
+import Shloka.Parse (Line (..))
+import Shloka.Syllable (Syllable(segments))
+import Data.Csv
+import qualified Data.ByteString.Lazy as ByteString
+import Data.Map (Map)
+import Shloka.Import
+import Shloka
 
-syllabifyVerse :: Text -> [[Token]]
-syllabifyVerse = syllabify . concatMap (tokenize . Text.replace "'" "") . Text.words
+analyse :: Line -> Map Text Text
+analyse l =
+  let
+    (parva, subParva, verse, subVerse) = lineLocation l
+    (verseParts, lengths, metre) = scanVerse $ lineText l
+  in
+  [ ("parva", pack $ show parva )
+  , ("sub_parva", pack $ show subParva)
+  , ("verse", pack $ show verse)
+  , ("sub_verse", maybe Text.empty Text.singleton subVerse)
+  , ("type", pack $ show $ lineType l)
+  , ("metre", maybe Text.empty (pack.show) metre)
+  , ("text", lineText l)
+  , ("syllables", Text.intercalate "/" $ map (Text.intercalate "." . map (Text.concat . segments)) verseParts)
+  , ("lengths", Text.intercalate "."$ map (pack.show) lengths)
+  ]
 
-data Metre = Shloka | Trishtubh
-    deriving (Show)
-
-data Length = Long | Short
-
-instance Show Length where
-    show Long = "–"
-    show Short = "⏑"
-    showList x s = concat (map show x) ++ s
-
-scanVerse :: Text -> ([Metre], [[Length]])
-scanVerse verse
-    | length verseParts == 1
-        && length (head syllables) == 16 =
-        ([Shloka], chunksOf 4 $ concat lengths)
-    | length verseParts == 2
-        && length (head syllables) == 11
-        && length (head $ tail $ syllables) == 11 =
-        ([Trishtubh], concatMap (chunksOf 4) lengths)
-    | otherwise = ([], lengths)
-  where
-    verseParts = Text.splitOn "; " verse
-    syllables = map syllabifyVerse verseParts
-    lengths = map (map scanSyllable) syllables
-
-scanSyllable :: [Token] -> Length
-scanSyllable syllable =
-    if length syllable > 2
-        then Long
-        else
-            if last syllable `elem` longVowelTokens
-                then Long
-                else Short
-
-mahabharataBook :: Int -> IO [Either NoLine Line]
-mahabharataBook book =
-    (either (error . show) id . parse) <$> Text.readFile (printf "text/MBh%02d.txt" book)
+csvColumns :: Header
+csvColumns = ["parva", "sub_parva", "verse", "sub_verse", "type", "metre", "text", "syllables", "lengths"]
 
 main :: IO ()
 main =
-    forM_ [1 .. 18] $ \book -> do
-        lines1 <- mahabharataBook book
-        let verses1 = rights lines1
-        forM_ verses1 $ \verse ->
-            printf
-                "%s %s %s\n"
-                (show $ lineLocation verse)
-                (show $ lineType verse)
-                (show $ scanVerse (lineText verse))
+    forM_ @[] [Mahabharata] $ \epic ->
+      forM_ @[] [1 .. kandaCount epic] $ \kanda -> do
+          kandaLines <- rights <$> readKanda epic kanda
+          ByteString.putStr $ encodeByName csvColumns $ map analyse kandaLines
