@@ -24,6 +24,6 @@ scanSyllable syllable =
 
 guessMetre :: [[Length]] -> Maybe Metre
 guessMetre verseParts
-  | [a] <- verseParts, length a == 16 = Just Shloka
-  | [a, b] <- verseParts, length a == 11 && length b == 11 = Just Trishtubh
-  | otherwise = Nothing
+    | [a] <- verseParts, length a == 16 = Just Shloka
+    | [a, b] <- verseParts, length a == 11 && length b == 11 = Just Trishtubh
+    | otherwise = Nothing

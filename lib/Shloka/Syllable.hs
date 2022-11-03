@@ -5,11 +5,11 @@ module Shloka.Syllable where
 
 import Data.Maybe (maybeToList)
 import Data.Void (Void)
-import Shloka.Token
 import Shloka.Extra (debug)
-import Text.Megaparsec (Parsec, eof, many, oneOf, optional, errorBundlePretty, parse, some, try, (<|>))
+import Shloka.Token
+import Text.Megaparsec (Parsec, eof, errorBundlePretty, many, oneOf, optional, parse, some, try, (<|>))
 
-newtype Syllable = Syllable { segments :: [Token] }
+newtype Syllable = Syllable {segments :: [Token]}
 
 instance Show Syllable where show = show . segments
 
