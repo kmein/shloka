@@ -7,8 +7,29 @@
 module Shloka.Token where
 
 import Data.List (find, sortOn)
+import Text.Megaparsec hiding (Token, token)
 import Data.Text (Text)
+import Data.List.NonEmpty (NonEmpty((:|)))
 import qualified Data.Text as Text
+
+instance VisualStream [Token] where
+  showTokens _ (t :| ts) = Text.unpack $ Text.intercalate "." (t:ts)
+
+instance TraversableStream [Token] where
+  -- https://hackage.haskell.org/package/megaparsec-9.2.1/docs/src/Text.Megaparsec.Stream.html#reachOffsetNoLine%27
+  reachOffsetNoLine o PosState {..} =
+      ( PosState
+          { pstateInput = post,
+            pstateOffset = max pstateOffset o,
+            pstateSourcePos = spos,
+            pstateTabWidth = pstateTabWidth,
+            pstateLinePrefix = pstateLinePrefix
+          }
+      )
+      where
+        spos = case pstateSourcePos of
+          (SourcePos n l c) -> SourcePos n l (c <> pos1)
+        post = drop (o - pstateOffset) pstateInput
 
 type Token = Text
 

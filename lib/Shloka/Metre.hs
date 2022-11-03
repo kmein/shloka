@@ -1,10 +1,10 @@
 module Shloka.Metre where
 
-import Shloka.Syllable (Syllable(Syllable))
+import Shloka.Syllable (Syllable, coda, nucleus)
 import Shloka.Token (longVowelTokens)
 
 data Metre = Shloka | Trishtubh
-    deriving (Show)
+    deriving (Eq, Show)
 
 data Length = Laghu | Guru
 

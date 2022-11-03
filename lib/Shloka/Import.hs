@@ -3,6 +3,7 @@ module Shloka.Import where
 
 import Shloka.Parse
 import Text.Printf (printf)
+import Text.Megaparsec (errorBundlePretty)
 import qualified Data.Text.IO as Text
 
 data Epic = Mahabharata | Ramayana
@@ -17,6 +18,6 @@ kandaCount = \case
 
 readKanda :: Epic -> Int -> IO Kanda
 readKanda epic kanda =
-  (either (error . show) id . parse) <$> Text.readFile (case epic of
+  (either (error . errorBundlePretty) id . parse) <$> Text.readFile (case epic of
     Mahabharata -> printf "text/MBh%02d.txt" kanda
     Ramayana -> printf "text/Ram%02d.txt" kanda)

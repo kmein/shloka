@@ -17,7 +17,7 @@ data NoLine = Comment Text
     deriving (Show)
 
 data LineType = Verse | Prose | Heading
-    deriving (Show)
+    deriving (Show, Eq)
 
 data Line = Line {lineLocation :: (Int, Int, Int, Maybe Char), lineType :: LineType, lineText :: Text}
     deriving (Show)
