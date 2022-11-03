@@ -6,7 +6,7 @@ module Main where
 
 import qualified Data.Text as Text
 
-import Control.Monad (forM_)
+import Control.Monad (forM)
 import qualified Data.ByteString.Lazy as ByteString
 import Data.Csv
 import Data.Either (rights)
@@ -37,7 +37,7 @@ csvColumns = ["parva", "sub_parva", "verse", "sub_verse", "type", "metre", "text
 
 main :: IO ()
 main =
-    forM_ @[] [Mahabharata] $ \epic ->
-        forM_ @[] [1 .. kandaCount epic] $ \kanda -> do
-            kandaLines <- rights <$> readKanda epic kanda
-            ByteString.putStr $ encodeByName csvColumns $ map analyse kandaLines
+    ByteString.putStr . encodeByName csvColumns . concat
+        =<< forM @[] [1 .. kandaCount epic] (fmap (map analyse . rights) . readKanda epic)
+  where
+    epic = Mahabharata

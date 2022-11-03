@@ -7,7 +7,7 @@ module Main where
 
 import qualified Data.Text as Text
 
-import Control.Monad (forM_)
+import Control.Monad (forM)
 import qualified Data.ByteString.Lazy as ByteString
 import Data.Csv
 import Data.Either (rights)
@@ -49,14 +49,13 @@ localiseWords line = go 1 [] $ Text.words $ lineText line
 
 main :: IO ()
 main =
-    forM_ @[] [Mahabharata] $ \epic ->
-        forM_ @[] [1 .. kandaCount epic] $ \kanda -> do
-            kandaLines <- rights <$> readKanda epic kanda
-            ByteString.putStr $
-                encodeByName csvColumns $
-                    concatMap localiseWords $
-                        filter isShloka $ kandaLines
+    ByteString.putStr . encodeByName csvColumns . concat
+        =<< forM @[]
+            [1 .. kandaCount epic]
+            ( fmap (concatMap localiseWords . filter isShloka . rights) . readKanda epic
+            )
   where
+    epic = Mahabharata
     isShloka line = lineType line == Verse && metre == Just Shloka
       where
         (_, _, metre) = scanVerse $ lineText line
