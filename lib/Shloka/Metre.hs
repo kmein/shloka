@@ -4,7 +4,7 @@ module Shloka.Metre where
 
 import Data.Text (Text, pack)
 import Shloka.Syllable (Syllable)
-import Shloka.Token (longVowelTokens)
+import Shloka.Token (longVowelTokens, wordSeparatorTokens)
 
 data Metre = Shloka | Trishtubh
     deriving (Eq, Show)
@@ -30,7 +30,7 @@ renderLengthWithBreak (l, b) =
 scanSyllable :: Syllable -> (Length, Maybe WordBreak)
 scanSyllable (vowel, coda) = (matra, wordEnd)
   where
-    cleanCoda = filter (/= " ") coda
+    cleanCoda = filter (`notElem` wordSeparatorTokens) coda
     matra =
         if vowel `elem` longVowelTokens || length cleanCoda > 1
             then Guru
