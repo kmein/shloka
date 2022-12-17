@@ -11,6 +11,10 @@ haskellPackages.developPackage {
       for book in $(seq 1 18); do
         ${pkgs.wget}/bin/wget "$(printf "https://bombay.indology.info/mahabharata/text/ASCII/MBh%02d.txt" "$book")" -P ${toString ./text}
       done
+
+      # in two instances, the retroflex ḷ = ḍ is used, this conflicts with the vocalic ḷ
+      sed -i s/eLako/eDako/g ${toString ./text}/MBh01.txt
+      sed -i s/dramiLAz/dramiDAz/g ${toString ./text}/MBh13.txt
     '')
     (pkgs.writers.writeDashBin "fetch-ram" ''
       for book in $(seq 1 7); do

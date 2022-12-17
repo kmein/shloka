@@ -9,36 +9,20 @@ import Shloka.Extra (debug)
 import Shloka.Token
 import Text.Megaparsec (Parsec, eof, errorBundlePretty, many, oneOf, optional, parse, some, try, (<|>))
 
-newtype Syllable = Syllable {segments :: [Token]}
-
-instance Show Syllable where show = show . segments
+type Syllable = (Token, [Token]) -- nucleus and following consonants
 
 tokenIsVowel :: Token -> Bool
 tokenIsVowel x = x `elem` shortVowelTokens || x `elem` longVowelTokens
 
-onset, rhyme, nucleus, coda :: Syllable -> [Token]
-onset = takeWhile (not . tokenIsVowel) . segments
-rhyme = dropWhile (not . tokenIsVowel) . segments
-nucleus = takeWhile tokenIsVowel . rhyme
-coda = dropWhile tokenIsVowel . rhyme
-
 syllabify :: [Token] -> [Syllable]
-syllabify toks = either (\e -> debug (errorBundlePretty e) []) (map Syllable) $ parse withInitialConsonant "" (reverse toks)
-  where
-    onHead :: (a -> a) -> [a] -> [a]
-    onHead f = \case
-        [] -> []
-        (x : xs) -> f x : xs
-    withInitialConsonant = do
-        syls <- some (try syllable)
-        initialConsonants <- many $ oneOf consonantTokens
-        eof
-        pure $ onHead (initialConsonants ++) (reverse syls)
-
--- parse in reverse: figure out syllables from right to left
-syllable :: Parsec Void [Token] [Token]
-syllable = do
-    codaTokens <- many $ oneOf consonantTokens
-    nucleusToken <- oneOf $ longVowelTokens <|> shortVowelTokens
-    onsetToken <- optional $ oneOf consonantTokens
-    return $ maybeToList onsetToken ++ [nucleusToken] ++ reverse codaTokens
+syllabify str
+    | null str = []
+    | otherwise =
+        let vowelInitialSubstring = dropWhile (not . tokenIsVowel) str
+            (vowels, rest) = span tokenIsVowel vowelInitialSubstring
+            (consonants, rest') = span (not . tokenIsVowel) rest
+         in case vowels of
+                [nucleus] -> (nucleus, consonants) : syllabify rest'
+                [nucleus1, nucleus2] -> (nucleus1, []) : (nucleus2, consonants) : syllabify rest'
+                -- 01,114.038a tathā devaṛṣīṇāṃ
+                _ -> error $ show str

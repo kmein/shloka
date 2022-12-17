@@ -1,6 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Shloka.Metre where
 
-import Shloka.Syllable (Syllable, coda, nucleus)
+import Data.Text (Text, pack)
+import Shloka.Syllable (Syllable)
 import Shloka.Token (longVowelTokens)
 
 data Metre = Shloka | Trishtubh
@@ -8,19 +11,31 @@ data Metre = Shloka | Trishtubh
 
 data Length = Laghu | Guru
 
+data WordBreak = WordBreak
+
 instance Show Length where
     show Laghu = "L"
     show Guru = "G"
     showList x s = concat (map show x) ++ s
 
-scanSyllable :: Syllable -> Length
-scanSyllable syllable =
-    if length (coda syllable) > 0
-        then Guru
-        else
-            if all (`elem` longVowelTokens) $ nucleus syllable
-                then Guru
-                else Laghu
+renderLengthWithBreak :: (Length, Maybe WordBreak) -> Text
+renderLengthWithBreak (l, b) =
+    pack $
+        ( case l of
+            Laghu -> "L"
+            Guru -> "G"
+        )
+            ++ maybe "" (const ".") b
+
+scanSyllable :: Syllable -> (Length, Maybe WordBreak)
+scanSyllable (vowel, coda) = (matra, wordEnd)
+  where
+    cleanCoda = filter (/= " ") coda
+    matra =
+        if vowel `elem` longVowelTokens || length cleanCoda > 1
+            then Guru
+            else Laghu
+    wordEnd = if " " `elem` coda then Just WordBreak else Nothing
 
 guessMetre :: [[Length]] -> Maybe Metre
 guessMetre verseParts

@@ -36,7 +36,7 @@ type Token = Text
 data VowelLength = Long | Short
     deriving (Show)
 
-data Category = Vowel VowelLength | Consonant
+data Category = Vowel VowelLength | Consonant | WordBreak
     deriving (Show)
 
 -- Harvard Kyoto is defined here: https://web.archive.org/web/20210302180033/https://indology.info/email/members/wujastyk/#x1-120005.2
@@ -51,6 +51,9 @@ shortVowelTokens = ["a", "i", "u", "R", "L"]
 longVowelTokens :: [Token]
 longVowelTokens = ["A", "I", "U", "e", "o", "ai", "au", "q", "E"]
 
+wordBreakTokens :: [Token]
+wordBreakTokens = [" "]
+
 tokenToCategory :: Token -> Category
 tokenToCategory token
     | token `elem` consonantTokens = Consonant
@@ -61,7 +64,7 @@ tokenToCategory token
 tokenize :: Text -> [Token]
 tokenize = go []
   where
-    allTokens = sortOn (negate . Text.length) $ consonantTokens ++ longVowelTokens ++ shortVowelTokens
+    allTokens = sortOn (negate . Text.length) $ consonantTokens ++ longVowelTokens ++ shortVowelTokens ++ wordBreakTokens
     matchingToken x = find (`Text.isPrefixOf` x) allTokens
     go acc word =
         case matchingToken word of
