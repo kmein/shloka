@@ -11,23 +11,21 @@ data Metre = Shloka | Trishtubh
 
 data Length = Laghu | Guru
 
-data WordBreak = WordBreak
-
 instance Show Length where
     show Laghu = "L"
     show Guru = "G"
     showList x s = concat (map show x) ++ s
 
-renderLengthWithBreak :: (Length, Maybe WordBreak) -> Text
-renderLengthWithBreak (l, b) =
+renderLengthWithBreak :: (Length, Int) -> Text
+renderLengthWithBreak (l, breaks) =
     pack $
         ( case l of
             Laghu -> "L"
             Guru -> "G"
         )
-            ++ maybe "" (const ".") b
+            ++ replicate breaks '.'
 
-scanSyllable :: Syllable -> (Length, Maybe WordBreak)
+scanSyllable :: Syllable -> (Length, Int)
 scanSyllable (vowel, coda) = (matra, wordEnd)
   where
     cleanCoda = filter (`notElem` wordSeparatorTokens) coda
@@ -35,7 +33,7 @@ scanSyllable (vowel, coda) = (matra, wordEnd)
         if vowel `elem` longVowelTokens || length cleanCoda > 1
             then Guru
             else Laghu
-    wordEnd = if " " `elem` coda then Just WordBreak else Nothing
+    wordEnd = length $ filter (== " ") coda
 
 guessMetre :: [[Length]] -> Maybe Metre
 guessMetre verseParts
