@@ -16,7 +16,6 @@ import Shloka
 import Shloka.Import
 import Shloka.Metre (renderLengthWithBreak)
 import Shloka.Parse (Line (..))
-import Shloka.Syllable (Syllable)
 
 analyse :: Line -> Map Text Text
 analyse l =

@@ -2,10 +2,9 @@
 
 module Shloka where
 
-import Data.List.Split (chunksOf)
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Shloka.Metre (Length, Metre (..), guessMetre, scanSyllable)
+import Shloka.Metre (Length, scanSyllable)
 import Shloka.Syllable (Syllable, syllabify)
 import Shloka.Token (tokenize)
 

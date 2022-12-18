@@ -3,11 +3,7 @@
 
 module Shloka.Syllable where
 
-import Data.Maybe (maybeToList)
-import Data.Void (Void)
-import Shloka.Extra (debug)
 import Shloka.Token
-import Text.Megaparsec (Parsec, eof, errorBundlePretty, many, oneOf, optional, parse, some, try, (<|>))
 
 type Syllable = (Token, [Token]) -- nucleus and following consonants
 
