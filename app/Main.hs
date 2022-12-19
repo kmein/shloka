@@ -21,10 +21,10 @@ analyse :: Line -> Map Text Text
 analyse l =
     let (parva, subParva, verse, subVerse) = lineLocation l
         (verseParts, lengths) = scanVerse $ lineText l
-     in [ ("parva", pack $ show parva)
-        , ("sub_parva", pack $ show subParva)
-        , ("verse", pack $ show verse)
-        , ("sub_verse", maybe Text.empty Text.singleton subVerse)
+     in [ ("parvan", pack $ show parva)
+        , ("adhyaya", pack $ show subParva)
+        , ("shloka", pack $ show verse)
+        , ("pada", maybe Text.empty Text.singleton subVerse)
         , ("type", pack $ show $ lineType l)
         , ("text", lineText l)
         , ("syllables", Text.intercalate "/" $ map (Text.intercalate "." . map (Text.concat . (\(v, cs) -> v : cs))) verseParts)
@@ -32,7 +32,7 @@ analyse l =
         ]
 
 csvColumns :: Header
-csvColumns = ["parva", "sub_parva", "verse", "sub_verse", "type", "text", "syllables", "lengths"]
+csvColumns = ["parvan", "adhyaya", "shloka", "pada", "type", "text", "syllables", "lengths"]
 
 main :: IO ()
 main =
