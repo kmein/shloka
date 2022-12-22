@@ -8,12 +8,6 @@ extra-source-files:
 library
     hs-source-dirs:   lib
     exposed-modules:  Shloka
-                    , Shloka.Extra
-                    , Shloka.Parse
-                    , Shloka.Metre
-                    , Shloka.Token
-                    , Shloka.Syllable
-                    , Shloka.Import
     build-depends:    base ^>=4.14.3.0
                     , megaparsec
                     , bytestring >= 0.10 && < 0.11

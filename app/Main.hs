@@ -12,10 +12,7 @@ import Data.Csv
 import Data.Either (rights)
 import Data.Map (Map)
 import Data.Text (Text, pack)
-import Shloka
-import Shloka.Import
-import Shloka.Metre (renderLengthWithBreak)
-import Shloka.Parse (Line (..))
+import Shloka (Epic (Mahabharata), Line (..), kandaCount, readKanda, renderLengthWithBreak, scanVerse)
 
 analyse :: Line -> Map Text Text
 analyse l =
@@ -27,12 +24,29 @@ analyse l =
         , ("pada", maybe Text.empty Text.singleton subVerse)
         , ("type", pack $ show $ lineType l)
         , ("text", lineText l)
-        , ("syllables", Text.intercalate "/" $ map (Text.intercalate "." . map (Text.concat . (\(v, cs) -> v : cs))) verseParts)
-        , ("lengths", Text.intercalate "; " $ map (Text.concat . map renderLengthWithBreak) lengths)
+        ,
+            ( "syllables"
+            , Text.intercalate "/" $
+                map (Text.intercalate "." . map (Text.concat . (\(v, cs) -> v : cs))) verseParts
+            )
+        ,
+            ( "lengths"
+            , Text.intercalate "; " $
+                map (Text.concat . map renderLengthWithBreak) lengths
+            )
         ]
 
 csvColumns :: Header
-csvColumns = ["parvan", "adhyaya", "shloka", "pada", "type", "text", "syllables", "lengths"]
+csvColumns =
+    [ "parvan"
+    , "adhyaya"
+    , "shloka"
+    , "pada"
+    , "type"
+    , "text"
+    , "syllables"
+    , "lengths"
+    ]
 
 main :: IO ()
 main =
