@@ -12,7 +12,7 @@ import Data.Text (Text, pack)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Data.Void (Void)
-import Text.Megaparsec hiding (parse, parseTest, Token)
+import Text.Megaparsec hiding (Token, parse, parseTest)
 import qualified Text.Megaparsec as Megaparsec
 import Text.Megaparsec.Char (char, crlf, digitChar, letterChar, string)
 import Text.Printf (printf)
@@ -52,7 +52,11 @@ data NoLine = Comment Text
 data LineType = Verse | Prose | Heading
     deriving (Show, Eq)
 
-data Line = Line {lineLocation :: (Int, Int, Int, Maybe Char), lineType :: LineType, lineText :: Text}
+data Line = Line
+    { lineLocation :: (Int, Int, Int, Maybe Char)
+    , lineType :: LineType
+    , lineText :: Text
+    }
     deriving (Show)
 
 parseTest :: Text -> IO ()
@@ -62,7 +66,13 @@ parse :: Text -> Either (ParseErrorBundle Text Void) [Either NoLine Line]
 parse = Megaparsec.parse theParser ""
 
 theParser :: Parser [Either NoLine Line]
-theParser = (((Right <$> parseLine) <|> (Left <$> parseComment)) `sepEndBy` crlf) <* eof
+theParser =
+    ( ( (Right <$> parseLine)
+            <|> (Left <$> parseComment)
+      )
+        `sepEndBy` crlf
+    )
+        <* eof
 
 parseComment :: Parser NoLine
 parseComment =
@@ -81,7 +91,12 @@ parseLine = do
             | isLower c -> pure Verse
             | isUpper c -> pure Prose
             | otherwise -> fail $ "Unexpected line type: " ++ show c
-    let lineLocation = (location1, location2, location3, if lineTypeChar == ' ' then Nothing else Just lineTypeChar)
+    let lineLocation =
+            ( location1
+            , location2
+            , location3
+            , if lineTypeChar == ' ' then Nothing else Just lineTypeChar
+            )
     _ <- char ' '
     lineText <- Text.pack <$> many harvardKyoto
     pure $ Line{..}
@@ -122,10 +137,16 @@ data VowelLength = Long | Short
 data Category = Vowel VowelLength | Consonant
     deriving (Show)
 
--- Harvard Kyoto is defined here: https://web.archive.org/web/20210302180033/https://indology.info/email/members/wujastyk/#x1-120005.2
-
 consonantTokens :: [Token]
-consonantTokens = ["k", "kh", "g", "gh", "G"] ++ ["c", "ch", "j", "jh", "J"] ++ ["T", "Th", "D", "Dh", "N"] ++ ["t", "th", "d", "dh", "n"] ++ ["p", "ph", "b", "bh", "m"] ++ ["y", "r", "l", "v"] ++ ["z", "S", "s", "h"] ++ ["M", "H", "&", "f", "x"]
+consonantTokens =
+    ["k", "kh", "g", "gh", "G"]
+        ++ ["c", "ch", "j", "jh", "J"]
+        ++ ["T", "Th", "D", "Dh", "N"]
+        ++ ["t", "th", "d", "dh", "n"]
+        ++ ["p", "ph", "b", "bh", "m"]
+        ++ ["y", "r", "l", "v"]
+        ++ ["z", "S", "s", "h"]
+        ++ ["M", "H", "&", "f", "x"]
 {-# NOINLINE consonantTokens #-}
 
 shortVowelTokens :: [Token]
@@ -147,7 +168,14 @@ tokenToCategory t
 tokenize :: Text -> [Token]
 tokenize = go []
   where
-    allTokens = sortOn (negate . Text.length) $ consonantTokens ++ longVowelTokens ++ shortVowelTokens ++ wordSeparatorTokens
+    allTokens =
+        sortOn (negate . Text.length) $
+            concat
+                [ consonantTokens
+                , longVowelTokens
+                , shortVowelTokens
+                , wordSeparatorTokens
+                ]
     matchingToken x = find (`Text.isPrefixOf` x) allTokens
     go acc word =
         case matchingToken word of
@@ -174,7 +202,8 @@ syllabify str
             (consonants, rest') = span (not . tokenIsVowel) rest
          in case vowels of
                 [nucleus] -> (nucleus, consonants) : syllabify rest'
-                [nucleus1, nucleus2] -> (nucleus1, []) : (nucleus2, consonants) : syllabify rest'
+                [nucleus1, nucleus2] ->
+                    (nucleus1, []) : (nucleus2, consonants) : syllabify rest'
                 -- 01,114.038a tathā devaṛṣīṇāṃ
                 _ -> error $ show str
 

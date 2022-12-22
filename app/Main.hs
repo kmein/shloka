@@ -12,7 +12,14 @@ import Data.Csv
 import Data.Either (rights)
 import Data.Map (Map)
 import Data.Text (Text, pack)
-import Shloka (Epic (Mahabharata), Line (..), kandaCount, readKanda, renderLengthWithBreak, scanVerse)
+import Shloka (
+    Epic (Mahabharata),
+    Line (..),
+    kandaCount,
+    readKanda,
+    renderLengthWithBreak,
+    scanVerse,
+ )
 
 analyse :: Line -> Map Text Text
 analyse l =
@@ -27,7 +34,11 @@ analyse l =
         ,
             ( "syllables"
             , Text.intercalate "/" $
-                map (Text.intercalate "." . map (Text.concat . (\(v, cs) -> v : cs))) verseParts
+                map
+                    ( Text.intercalate "."
+                        . map (Text.concat . (\(v, cs) -> v : cs))
+                    )
+                    verseParts
             )
         ,
             ( "lengths"
@@ -51,6 +62,8 @@ csvColumns =
 main :: IO ()
 main =
     ByteString.putStr . encodeByName csvColumns . concat
-        =<< forM @[] [1 .. kandaCount epic] (fmap (map analyse . rights) . readKanda epic)
+        =<< forM @[]
+            [1 .. kandaCount epic]
+            (fmap (map analyse . rights) . readKanda epic)
   where
     epic = Mahabharata
