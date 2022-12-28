@@ -47,7 +47,11 @@ analyse l =
             , Text.intercalate "/" $
                 map
                     ( Text.intercalate "."
-                        . map (\(v, cs) -> Text.pack $ map (categorySymbol . tokenToCategory) $ v : cs)
+                        . map
+                            ( \(v, cs) ->
+                                Text.pack $
+                                    map (categorySymbol . tokenToCategory) $ v : cs
+                            )
                     )
                     verseParts
             )

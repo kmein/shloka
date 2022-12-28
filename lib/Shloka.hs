@@ -240,7 +240,9 @@ scanSyllable (vowel, coda) = (matra, wordEnd)
   where
     cleanCoda = filter (`notElem` wordSeparatorTokens) coda
     matra =
-        if vowel `elem` longVowelTokens || length cleanCoda > 1 || "ch" `elem` cleanCoda
+        if vowel `elem` longVowelTokens
+            || length cleanCoda > 1
+            || "ch" `elem` cleanCoda
             then Guru
             else Laghu
     wordEnd = length $ filter (== " ") coda
