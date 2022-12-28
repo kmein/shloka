@@ -134,7 +134,7 @@ type Token = Text
 data VowelLength = Long | Short
     deriving (Show)
 
-data Category = Vowel VowelLength | Consonant
+data Category = Vowel VowelLength | Consonant | Break
     deriving (Show)
 
 consonantTokens :: [Token]
@@ -163,7 +163,15 @@ tokenToCategory t
     | t `elem` consonantTokens = Consonant
     | t `elem` shortVowelTokens = Vowel Short
     | t `elem` longVowelTokens = Vowel Long
+    | t `elem` wordSeparatorTokens = Break
     | otherwise = error $ "No such token: " ++ show t
+
+categorySymbol :: Category -> Char
+categorySymbol = \case
+    Consonant -> 'C'
+    Vowel Long -> 'V'
+    Vowel Short -> 'v'
+    Break -> ' '
 
 tokenize :: Text -> [Token]
 tokenize = go []

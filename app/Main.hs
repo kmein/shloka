@@ -15,10 +15,12 @@ import Data.Text (Text, pack)
 import Shloka (
     Epic (Mahabharata),
     Line (..),
+    categorySymbol,
     kandaCount,
     readKanda,
     renderLengthWithBreak,
     scanVerse,
+    tokenToCategory,
  )
 
 analyse :: Line -> Map Text Text
@@ -41,6 +43,15 @@ analyse l =
                     verseParts
             )
         ,
+            ( "syllables_symbols"
+            , Text.intercalate "/" $
+                map
+                    ( Text.intercalate "."
+                        . map (\(v, cs) -> Text.pack $ map (categorySymbol . tokenToCategory) $ v : cs)
+                    )
+                    verseParts
+            )
+        ,
             ( "lengths"
             , Text.intercalate "; " $
                 map (Text.concat . map renderLengthWithBreak) lengths
@@ -56,6 +67,7 @@ csvColumns =
     , "type"
     , "text"
     , "syllables"
+    , "syllables_symbols"
     , "lengths"
     ]
 
