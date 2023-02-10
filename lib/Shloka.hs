@@ -33,7 +33,7 @@ kandaCount = \case
 
 readKanda :: Epic -> Int -> IO Kanda
 readKanda epic kanda =
-    (either (error . errorBundlePretty) id . parse)
+    (either (error . errorBundlePretty) id . parse epic)
         <$> Text.readFile
             ( case epic of
                 Mahabharata -> printf "text/MBh%02d.txt" kanda
@@ -59,15 +59,15 @@ data Line = Line
     }
     deriving (Show)
 
-parseTest :: Text -> IO ()
-parseTest = Megaparsec.parseTest theParser
+parseTest :: Epic -> Text -> IO ()
+parseTest epic = Megaparsec.parseTest (theParser epic)
 
-parse :: Text -> Either (ParseErrorBundle Text Void) [Either NoLine Line]
-parse = Megaparsec.parse theParser ""
+parse :: Epic -> Text -> Either (ParseErrorBundle Text Void) [Either NoLine Line]
+parse epic = Megaparsec.parse (theParser epic) ""
 
-theParser :: Parser [Either NoLine Line]
-theParser =
-    ( ( (Right <$> parseLine)
+theParser :: Epic -> Parser [Either NoLine Line]
+theParser epic =
+    ( ( (Right <$> parseLine epic)
             <|> (Left <$> parseComment)
       )
         `sepEndBy` crlf
@@ -79,9 +79,9 @@ parseComment =
     Comment . Text.pack
         <$> (string "%" *> optional (char ' ') *> (many (noneOf ['\r', '\n'])))
 
-parseLine :: Parser Line
-parseLine = do
-    location1 <- read <$> count 2 digitChar
+parseLine :: Epic -> Parser Line
+parseLine epic = do
+    location1 <- read <$> count (length $ show $ kandaCount epic) digitChar
     location2 <- read <$> count 3 digitChar
     location3 <- read <$> count 3 digitChar
     lineTypeChar <- letterChar <|> char ' '
