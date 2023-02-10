@@ -8,12 +8,12 @@ extra-source-files:
 library
     hs-source-dirs:   lib
     exposed-modules:  Shloka
-    build-depends:    base ^>=4.14.3.0
+    build-depends:    base ^>=4.15.0.0
                     , megaparsec
                     , bytestring >= 0.10 && < 0.11
                     , vector >= 0.12 && < 0.13
                     , cassava >= 0.5 && < 0.6
-                    , unicode-transforms >= 0.3 && < 0.4
+                    , unicode-transforms ^>= 0.4
                     , text >= 1 && < 2
                     , split >= 0.2 && < 0.3
     default-language: Haskell2010
@@ -22,7 +22,7 @@ library
 executable shloka
     main-is:          Main.hs
     hs-source-dirs:   app
-    build-depends:    base ^>=4.14.3.0
+    build-depends:    base ^>=4.15.0.0
                     , shloka
                     , text >= 1 && < 2
                     , cassava >= 0.5 && < 0.6
