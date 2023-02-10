@@ -103,7 +103,7 @@ parseLine epic = do
   where
     harvardKyoto =
         letterChar
-            <|> oneOf (" '-;:" :: [Char])
+            <|> oneOf (" '-;&:" :: [Char])
             <|> (' ' <$ (digitChar <|> oneOf ("[]=" :: [Char])))
 
 instance VisualStream [Token] where
