@@ -13,7 +13,7 @@ import Data.Either (rights)
 import Data.Map (Map)
 import Data.Text (Text, pack)
 import Shloka (
-    Epic (Mahabharata),
+    Epic (Mahabharata, Ramayana),
     Line (..),
     categorySymbol,
     kandaCount,
@@ -22,6 +22,7 @@ import Shloka (
     scanVerse,
     tokenToCategory,
  )
+import System.Environment (lookupEnv)
 
 analyse :: Line -> Map Text Text
 analyse l =
@@ -76,10 +77,13 @@ csvColumns =
     ]
 
 main :: IO ()
-main =
+main = do
+    epicString <- lookupEnv "EPIC"
+    let epic = case epicString of
+          Just "mahabharata" -> Mahabharata
+          Just "ramayana" -> Ramayana
+          _ -> error "Please provide info on which epic you want to analyse in the EPIC environment variable."
     ByteString.putStr . encodeByName csvColumns . concat
         =<< forM @[]
             [1 .. kandaCount epic]
             (fmap (map analyse . rights) . readKanda epic)
-  where
-    epic = Mahabharata
