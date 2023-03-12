@@ -77,8 +77,7 @@
 
   in {
     packages.${system} = {
-      default = self.pakages.${system}.shloka;
-      shloka = pkgs.haskellPackages.callCabal2nix "shloka" ./. {};
+      shloka = pkgs.haskellPackages.callCabal2nix "shloka" ./scansion {};
       mahabharata = mahabharata;
       ramayana = ramayana;
       mahabharata-csv = pkgs.runCommand "mahabharata.csv" {} ''
@@ -124,7 +123,7 @@
     };
 
     devShells.${system}.default = with pkgs; haskellPackages.developPackage {
-      root = ./.;
+      root = ./scansion;
       modifier = drv: haskell.lib.addBuildTools drv (with haskellPackages; [
         cabal-install
         ghcid
