@@ -87,6 +87,21 @@
       ramayana-csv = pkgs.runCommand "ramayana.csv" {} ''
         cat ${ramayana}/* | EPIC=ramayana ${self.packages.${system}.shloka}/bin/shloka > $out
       '';
+      mahabharata-assets = pkgs.runCommand "assets" {} ''
+        PATH=$PATH:${nixpkgs.lib.makeBinPath [pythonInstallation]} \
+        EPIC_CSV=${self.packages.${system}.mahabharata-csv} \
+        papermill ${./statistics.ipynb} /dev/null
+
+        for figure in assets/*.svg; do
+          ${pkgs.inkscape}/bin/inkscape -D --export-latex --export-filename="assets/$(basename "$figure" .svg).pdf" "$figure"
+        done
+
+        # make table page break footer empty. original one is ugly and in english
+        ${pkgs.gnused}/bin/sed -i '/endhead/,/endfoot/{//!d}' assets/table-*.tex
+
+        mkdir -p $out
+        cp assets/*{tex,pdf} $out/
+      '';
     };
 
     apps.${system} = {
