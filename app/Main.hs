@@ -16,8 +16,7 @@ import Shloka (
     Epic (Mahabharata, Ramayana),
     Line (..),
     categorySymbol,
-    kandaCount,
-    readKanda,
+    readStdin,
     renderLengthWithBreak,
     scanVerse,
     tokenToCategory,
@@ -26,12 +25,12 @@ import System.Environment (lookupEnv)
 
 analyse :: Line -> Map Text Text
 analyse l =
-    let (parva, subParva, verse, subVerse) = lineLocation l
+    let (parva, adhyaya, shloka, pada) = lineLocation l
         (verseParts, lengths) = scanVerse $ lineText l
      in [ ("parvan", pack $ show parva)
-        , ("adhyaya", pack $ show subParva)
-        , ("shloka", pack $ show verse)
-        , ("pada", maybe Text.empty Text.singleton subVerse)
+        , ("adhyaya", pack $ show adhyaya)
+        , ("shloka", pack $ show shloka)
+        , ("pada", maybe Text.empty Text.singleton pada)
         , ("type", pack $ show $ lineType l)
         , ("text", lineText l)
         ,
@@ -83,7 +82,4 @@ main = do
           Just "mahabharata" -> Mahabharata
           Just "ramayana" -> Ramayana
           _ -> error "Please provide info on which epic you want to analyse in the EPIC environment variable."
-    ByteString.putStr . encodeByName csvColumns . concat
-        =<< forM @[]
-            [1 .. kandaCount epic]
-            (fmap (map analyse . rights) . readKanda epic)
+    ByteString.putStr . encodeByName csvColumns =<< (fmap (map analyse . rights) $ readStdin epic)
