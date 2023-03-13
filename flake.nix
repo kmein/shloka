@@ -112,14 +112,6 @@
           jupyter notebook
         '');
       };
-      generate-assets = {
-        type = "app";
-        program = toString (pkgs.writers.writeDash "generate-assets" ''
-          PATH=${nixpkgs.lib.makeBinPath [pythonInstallation]} \
-          EPIC_CSV=${self.packages.${system}.mahabharata-csv} \
-          papermill ${./statistics.ipynb} /dev/null
-        '');
-      };
     };
 
     devShells.${system}.default = with pkgs; haskellPackages.developPackage {
