@@ -99,7 +99,7 @@
         ${pkgs.gnused}/bin/sed -i '/endhead/,/endfoot/{//!d}' assets/table-*.tex
 
         mkdir -p $out
-        cp assets/*{tex,pdf} $out/
+        cp assets/*{html,svg,tex,pdf} $out/
       '';
     };
 
