@@ -44,7 +44,7 @@
       (fetchMbh 04 { hash = "sha256-e0Dt2bppAhIvpNEnVV0aUrnjeCtewty97wd++Y93hEQ="; })
       (fetchMbh 05 { hash = "sha256-AaBQ+v1z8uoTR9qtwVO9BCqM+dsNq5Zr1s/4GNelBcs="; })
       (fetchMbh 06 { hash = "sha256-qe9NecSgOSjlcZg9GEIZwGrntP33Tg4/GvDLKrQ8lKw="; })
-      (fetchMbh 07 { hash = "sha256-9JlAi4JGk7f9RM7kJeRvf/ZzsdWo8wAgzTbKOJDKOFo="; })
+      (fetchMbh 07 { hash = "sha256-3i7cfR/n/clwrik3Fuu+uvb/fM/hNQqbQjhk3HyA9xY="; postFetch = "${pkgs.gnused}/bin/sed -i s/ṃ/M/g $out"; }) # someone broke it upstream
       (fetchMbh 08 { hash = "sha256-6GByL9XATWpqY8BmO4kMNyhfWZTz4jUUySZJwI3u9Rg="; })
       (fetchMbh 09 { hash = "sha256-ODGgElAXz97bmEZw4ZsECTUkitlmKqo+FmoaE+IrgjE="; })
       (fetchMbh 10 { hash = "sha256-wyoJYc4iEQeNQaWm0Y7bcVkRFvIwHt7bF02SFf2MVt0="; })
